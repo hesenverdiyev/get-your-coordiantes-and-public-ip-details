@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Get Your Coordinates and Public IP with One-Click</title>
+  <meta name="author" content="Hasan Verdiyev">
+</head>
+<body>
+<script>
+function getLocation() {
+  const coordinatesDiv = document.getElementById("coordinates");
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      // Success callback
+      function(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        fetch('https://ipapi.co/json/')
+          .then(response => response.json())
+          .then(data => {
+            const publicIP = data.ip;
+            const city = data.city;
+            const country = data.country_name;
+            coordinatesDiv.innerHTML = `
+              <h1>
+                Latitude: ${latitude}<br>
+                Longitude: ${longitude}<br>
+                Public IP: ${publicIP}<br>
+                IP Location: ${city}, ${country}<br> 
+              </h1>
+            `;
+          })
+          .catch(error => {
+            console.error('Error fetching IP/location data:', error);
+            coordinatesDiv.innerHTML = `
+              <h1>
+                Latitude: ${latitude}<br>
+                Longitude: ${longitude}<br>
+                Public IP: Error fetching IP<br>
+                City: N/A<br>
+                Country: N/A
+              </h1>
+            `;
+          });
+      },
+
+      // Error callback (e.g., user denies geolocation)
+      function(error) {
+        // Just show IP details
+        fetch('https://ipapi.co/json/')
+          .then(response => response.json())
+          .then(data => {
+            const publicIP = data.ip;
+            const city = data.city;
+            const country = data.country_name;
+            coordinatesDiv.innerHTML = `
+              <h1>
+                Geolocation not allowed<br>
+                Public IP: ${publicIP}<br>
+                IP Location: ${city}, ${country}<br> 
+              </h1>
+            `;
+          })
+          .catch(error => {
+            console.error('Error fetching IP/location data:', error);
+            coordinatesDiv.innerHTML = `
+              <h1>
+                Geolocation not allowed<br>
+                Public IP: Error fetching IP<br>
+                City: N/A<br>
+                Country: N/A
+              </h1>
+            `;
+          });
+      }
+    );
+  } else {
+    coordinatesDiv.innerHTML = "Geolocation is not allowed by User or not supported";
+  }
+}
+</script>
+
+<button onclick="getLocation()" style="width: 200px; height: 50px;">Get Coordinates and Public IP</button>
+<div id="coordinates"></div>
+
+</body>
+</html>
